@@ -2,7 +2,6 @@ var express = require("express");
 var bodyParser = require('body-parser');
 var randomstring = require("randomstring");
 var cons = require('consolidate');
-var querystring = require('querystring');
 var __ = require('underscore');
 __.string = require('underscore.string');
 const mongoose = require('mongoose');
@@ -10,7 +9,6 @@ var randtoken = require('rand-token');
 var jwt = require('jsonwebtoken');
 
 require('dotenv').config({path: './config/config.env'});
-console.log(process.env.SEED);
 
 var userService= require("./mongoUser");
 var clientService = require("./mongoClient");
@@ -32,15 +30,11 @@ const db = mongoose.connect('mongodb://'+process.env.USERMONGO+':'+process.env.P
     .then(() => console.log('Connect to MongoDB..'))
     .catch(err => console.error('Could not connect to MongoDB..', err))
 
-
-
-
 app.post('/oauth/token',async  function(req, res) {
     let clientObject = decodeClientCredentials(req);
     let scopeBody = req.body.scope ?  req.body.scope.split(' ') : undefined;
     if(clientObject.id){
         let cliente = await clientService.getClient(clientObject.id);
-        console.log(cliente);
                 if(cliente){
                     if(clientObject.secret === cliente.clientSecret){
                     if (req.body.grant_type == 'password'){
@@ -79,11 +73,9 @@ app.post('/oauth/token',async  function(req, res) {
                         if (refresh) {
                             let token = await tokenService.getTokenByRefresh(refresh);
                             if (token) {
-                                console.log(token);
                                 if (clientObject.id === token.client.clientId) {
                                     var now = Math.floor(Date.now() / 1000);
                                     if (token.refresh_token_expires_in_date >= now) {
-                                        console.log('pase');
                                         let user = await userService.getUserByUsername(token.user.username);
                                         let scopes= '';
                                         let arrayUserScope= user.scope;
@@ -165,9 +157,11 @@ var decodeClientCredentials = function(req) {
 
     if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
         //check the body
-        if(req.body.username && req.body.password){
+        if(req.body.client_Id){
             clientId = req.body.client_Id;
-            clientSecret = req.body.client_secret;
+            if(req.body.client_secret){
+                clientSecret = req.body.client_secret;
+            }
         }
     }else{
         const base64Credentials =  req.headers.authorization.split(' ')[1];
@@ -177,12 +171,6 @@ var decodeClientCredentials = function(req) {
 
     return { id: clientId, secret: clientSecret };
 };
-
-var getScopesFromForm = function(body) {
-    return __.filter(__.keys(body), function(s) { return __.string.startsWith(s, 'scope'); })
-        .map(function(s) { return s.slice('scope'.length); });
-};
-
 
 var server = app.listen(9003, 'localhost', function () {
     var host = server.address().address;
