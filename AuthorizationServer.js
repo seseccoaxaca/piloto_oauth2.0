@@ -36,7 +36,11 @@ app.post('/oauth/token',async  function(req, res) {
     if(clientObject.id){
         let cliente = await clientService.getClient(clientObject.id);
                 if(cliente){
-                    if(clientObject.secret === cliente.clientSecret){
+                    let clientSecret='';
+                    if(cliente.clientSecret){
+                        clientSecret = cliente.clientSecret;
+                    }
+                    if(clientObject.secret === clientSecret){
                     if (req.body.grant_type == 'password'){
                         let username = req.body.username;
                         let password = req.body.password;
