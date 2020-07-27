@@ -1,7 +1,6 @@
 
 var userModel = require('./mongo/model/user');
 
-
 async  function getUser (username, password){
    return  await userModel.findOne({
         username: username,

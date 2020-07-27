@@ -20,11 +20,6 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); // support form-encoded bodies (for the token endpoint)
 
-app.engine('html', cons.underscore);
-app.set('view engine', 'html');
-app.set('views', 'files/authorizationServer');
-app.set('json spaces', 4);
-
 //connection mongo db
 const db = mongoose.connect('mongodb://'+process.env.USERMONGO+':'+process.env.PASSWORDMONGO+'@'+process.env.HOSTMONGO+'/'+process.env.DATABASE, { useNewUrlParser: true,  useUnifiedTopology: true  })
     .then(() => console.log('Connect to MongoDB..'))
@@ -132,15 +127,15 @@ app.post('/oauth/token',async  function(req, res) {
 });
 
 function createToken(clientId,username, scope){
-    let expiresin = Number(process.env.EXT);
+    let expiresin = Number(process.env.EXT); //se obtienen los segundos de vida del token
 
     let access_token = jwt.sign({
         username: username,
         jti: randomstring.generate(8),
         scope : scope
-    },process.env.SEED,{expiresIn : expiresin });
+    },process.env.SEED,{expiresIn : expiresin }); //se genera el JWT y se se agregan a su payload algunos atributos que consideramos se utilizaran en el API
 
-    var tokenResponse = {
+    let tokenResponse = {
         access_token: access_token,
         token_type: 'bearer',
         expires_in: expiresin, //value in seconds
@@ -154,10 +149,10 @@ function createToken(clientId,username, scope){
     return tokenResponse;
 }
 
-var decodeClientCredentials = function(req) {
+let decodeClientCredentials = function(req) {
 
-    var clientId;
-    var clientSecret ='';
+    let clientId;
+    let clientSecret ='';
 
     if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
         //check the body
@@ -176,10 +171,9 @@ var decodeClientCredentials = function(req) {
     return { id: clientId, secret: clientSecret };
 };
 
-var server = app.listen(9003, 'localhost', function () {
-    var host = server.address().address;
-    var port = server.address().port;
-
+let server = app.listen(9003, function () {
+    let host = server.address().address;
+    let port = server.address().port;
     console.log(' Authorization Server is listening at http://%s:%s', host, port);
 });
 
