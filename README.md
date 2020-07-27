@@ -1,62 +1,13 @@
 SISTEMA DE AUTORIZACIÓN OAUTH 2.0
 
-**Contenido**
-
-**[Introducción](#_30j0zll) 2**
-
-[Propósito](#_dd8gh98tiz1j) 2
-
-[Historial de Revisiones](#_v0x9ye6n6dml) 2
-
-**[Especificaciones técnicas](#_71aeukm2dy4r) 2**
-
-[Ejecución del programa](#_6020ybubm8im) 2
-
-[Variables de entorno](#_z1mh0p61l8oc) 5
-
-[Esquemas en la base de datos](#_dsldk0afh95n) 6
-
-[Obtención del token](#_vi6zurrx86we) 8
-
-[Scopes](#_l60lmbc9uoyu) 9
-
-[Respuesta de la solicitud](#_el8r1ziovskq) 9
-
-**[Transferencia de conocimiento](#_27uuq5apwjyd) 10**
-
-[Tecnologías utilizadas](#_k0r4ewhq88yh) 10
-
-[Funciones utilizadas](#_ilfg28ho9kw0) 11
-
-[Servicios MongoDB](#_rwpopdeaim8f) 13
-
-[mongoUser](#_gcuaolek9o4b) 13
-
-[mongoClient](#_36xwcxlneu51) 14
-
-[mongoToken](#_l1fl6ucrz8ou) 14
-
-[Modelos y Esquemas](#_sxz3r5g0w6ug) 15
-
-[Lógica principal](#_oya9hdq3tob2) 15
-
-[Respuestas de error y causas](#_e5cvitsep1hi) 17
-
-**[Glosario](#_z337ya) 17**
-
-**[Referencias](#_3j2qqm3) 18**
-
-1.
 # Introducción
 
 El presente documento describe los mecanismos de interconexión para los Sistemas 2 (S2) y 3 (S3) con la Plataforma Digital Nacional (PDN) en un ambiente de pruebas. Esta información es proporcionada a los equipos técnicos de las Secretarías Ejecutivas de los Sistemas Locales Anticorrupción (SESLAs) y Secretaría Ejecutiva de los Sistemas Nacionales Anticorrupción (SESNA) para la implementación de estos mecanismos, con datos sintéticos, en tres estados pilotos (Chihuahua, Jalisco y Oaxaca).
 
-  1.
 ## Propósito
 
 El propósito de este documento es proporcionar toda la información relevante con respecto a la implementación del mecanismo de autorización Oauth 2.0 utilizado en esta solución para el cliente.
 
-  1.
 ## Historial de Revisiones
 
 | **Revisión** | **Autor** | **Fecha** | **Razón del cambio** |
@@ -64,10 +15,10 @@ El propósito de este documento es proporcionar toda la información relevante c
 | PA1 | E. Camargo | 21-Jul-2020 | Primera revisión del documento |
 | A | H. Rodríguez | 24-Jul-2020 | Documento aprobado |
 
-1.
+
 # Especificaciones técnicas
 
-  1.
+
 ## Ejecución del programa
 
 - El servicio del servidor de autorización OAuth 2.0 deberá descargarlo del repositorio de Github de la PDN del siguiente link, siguiendo las instrucciones que ahí se especifican...
@@ -82,33 +33,31 @@ $ git clone https://github.com/PDNMX/piloto\_oauth2.0.git
 
 - Deberá colocar nuestro Dockerfile dentro de la carpeta de nuestro proyecto
 
+```sh
 FROM node:12
-
 ADD . /oauth20
-
 WORKDIR /oauth20
-
+ 
 RUN yarn add global yarn \
-
-&amp;&amp; yarn install \
-
-&amp;&amp; yarn cache clean
-
+&& yarn install \
+&& yarn cache clean
+ 
 EXPOSE 9003
+CMD ["yarn", "start"]
 
-CMD [&quot;yarn&quot;, &quot;start&quot;]
+```
+
+
 
 - Se requiere modificar el archivo _package.json_ y sustituir el campo scripts por el siguiente código
 
-&quot;scripts&quot;: {
-
-&quot;test&quot;: &quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;,
-
-&quot;dev&quot;: &quot;nodemon node AuthorizationServer.js&quot;,
-
-&quot;start&quot;: &quot;node AuthorizationServer.js&quot;
-
+```javascript
+"scripts": {
+ "test": "echo \"Error: no test specified\" && exit 1",
+ "dev": "nodemon node AuthorizationServer.js",
+ "start": "node AuthorizationServer.js"
 }
+```
 
 - Modificar el archivo package.json en la sección de scripts como se indica a continuación
 
@@ -152,6 +101,7 @@ CMD [&quot;yarn&quot;, &quot;start&quot;]
 
 - Agregaremos un nuevo servicio al archivo docker-compose.yml en la carpeta designada para mongodb de la siguiente forma…
 
+```sh
 ..
 
 Oauth20:
@@ -179,6 +129,7 @@ depends_on:
 - mongo
 
 ..
+```
 
 El puerto incluye el mapeo del puerto en el host con el puerto interno en el contenedor \&lt;host\&gt;:\&lt;contenedor\&gt;, el puerto interno deberá coincidir con el puerto especificado dentro del código de nodejs, en este caso usaremos 9003.
 
@@ -283,20 +234,15 @@ El campo client\_secret por ser opcional puede ir o no dentro de cualquiera de l
 
 Colocar el comando curl para realizar una petición hacia el servidor de autenticación solo como ejemplo:
 
-curl --location --request POST &#39;http://127.0.0.1:9003/oauth/token&#39; \
-
---header &#39;Content-Type: application/x-www-form-urlencoded&#39; \
-
---header &#39;Authorization: Basic dHhtLmdsb2JhbDo=&#39; \
-
---data-urlencode &#39;grant\_type=password&#39; \
-
---data-urlencode &#39;username=ecamargo&#39; \
-
---data-urlencode &#39;password=123456&#39; \
-
---data-urlencode &#39;scope=read writeSuper&#39;
-
+```sh
+curl --location --request POST 'http://127.0.0.1:9003/oauth/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--header 'Authorization: Basic dHhtLmdsb2JhbDo=' \
+--data-urlencode 'grant_type=password' \
+--data-urlencode 'username=ecamargo' \
+--data-urlencode 'password=123456' \
+--data-urlencode 'scope=read writeSuper'
+```
   
 ## Scopes
 
@@ -355,59 +301,42 @@ El archivo que contiene la lógica del servidor es AuthorizationServer.js. De es
 
 Para poder acceder a la base de datos se tiene el siguiente fragmento de código:
 
+
+```javascript
 //connection mongo db
-
-const db = mongoose.connect(&#39;mongodb://&#39;+_ **process** _.env.USERMONGO+&#39;:&#39;+_ **process** _.env.PASSWORDMONGO+&#39;@&#39;+_ **process** _.env.HOSTMONGO+&#39;/&#39;+_ **process** _.env.DATABASE, { useNewUrlParser: true, useUnifiedTopology: true })
-
-.then(() =\&gt; _ **console** _.log(&#39;Connect to MongoDB..&#39;))
-
-.catch(err =\&gt; _ **console** _.error(&#39;Could not connect to MongoDB..&#39;, err))
-
-  1.
+const db = mongoose.connect('mongodb://'+process.env.USERMONGO+':'+process.env.PASSWORDMONGO+'@'+process.env.HOSTMONGO+'/'+process.env.DATABASE, { useNewUrlParser: true,  useUnifiedTopology: true  })
+   .then(() => console.log('Connect to MongoDB..'))
+   .catch(err => console.error('Could not connect to MongoDB..', err))
+```
 ## Funciones utilizadas
 
 La función createToken genera el token que se ingresara a la base de datos. Como parámetros de entrada tenemos el clientId , username y los scopes, los cuales se obtienen de solicitudes hacia la base de datos previamente a la llamada de la función.
 
+```javascript
 function createToken(clientId,username, scope){
+   let expiresin = Number(process.env.EXT); //se obtienen los segundos de vida del token
 
-let expiresin = _ **Number** _(_ **process** _.env.EXT); //se obtienen los segundos de vida del token
+   let access_token = jwt.sign({
+       username: username,
+       jti: randomstring.generate(8),
+       scope : scope
+   },process.env.SEED,{expiresIn : expiresin }); //se genera el JWT y se se agregan a su payload algunos atributos que consideramos se utilizaran en el API
 
-let access\_token = jwt.sign({
-
-username: username,
-
-jti: randomstring.generate(8),
-
-scope : scope
-
-},_ **process** _.env.SEED,{expiresIn : expiresin }); //se genera el JWT y se se agregan a su payload algunos atributos que consideramos se utilizaran en el API
-
-var tokenResponse = {
-
-access\_token: access\_token,
-
-token\_type: &#39;bearer&#39;,
-
-expires\_in: expiresin, //value in seconds
-
-refreshToken: randtoken.uid(256),
-
-refresh\_token\_expires\_in: _ **Number** _(_ **process** _.env.RTEXT) , //value in seconds
-
-refresh\_token\_expires\_in\_date: _ **Math** _.floor(_ **Date** _.now() / 1000) + _ **Number** _(_ **process** _.env.RTEXT) ,
-
-scope: scope,
-
-client: {clientId: clientId},
-
-user: {username : username}
-
+   var tokenResponse = {
+       access_token: access_token,
+       token_type: 'bearer',
+       expires_in: expiresin, //value in seconds
+       refreshToken: randtoken.uid(256),
+       refresh_token_expires_in: Number(process.env.RTEXT) , //value in seconds
+       refresh_token_expires_in_date: Math.floor(Date.now() / 1000) + Number(process.env.RTEXT) ,
+       scope: scope,
+       client: {clientId: clientId},
+       user: {username : username}
+   }
+   return tokenResponse;
 }
 
-return tokenResponse;
-
-}
-
+```
 En el código, se obtiene la expiración del token y posteriormente, se genera el JWT. Aquí se observa que solicitamos variables de entorno relacionadas con el token como el **SEED** ylos tiempos de expiración.
 
 Una vez creado el JWT se agrega como valor al campo access\_token,se llenan los demás campos con los parámetros en entrada de la función y otros se generan en tiempo de ejecución, como lo es el refreshToken que es un random String. Para este último se usa la librería rand-token para generarlo y retornar el objeto.
@@ -417,42 +346,31 @@ Para mayor información de la librería rand-token, consulte el siguiente enlace
 La función decodeClientCredentials lo que realiza es tomar el objeto _&quot;req&quot;,_ que es la solicitud que llega de algún ente externo al servidor, y busca si los parámetros client\_Id y client\_secret se enviaron dentro del header de la solicitud o si se enviaron como parámetros del body. Se extraen de cualquiera de los dos casos y se devuelven.
  Como el client\_secret es opcional, se inicializa como un string vacío el cual más adelante se usará para validar si existe o no un valor en client\_secret en la base de datos.
 
+
+```javascript
 var decodeClientCredentials = function(req) {
 
-var clientId;
+   var clientId;
+   var clientSecret ='';
 
-var clientSecret =&#39;&#39;;
+   if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
+       //check the body
+       if(req.body.client_Id){
+           clientId = req.body.client_Id;
+           if(req.body.client_secret){
+               clientSecret = req.body.client_secret;
+           }
+       }
+   }else{
+       const base64Credentials =  req.headers.authorization.split(' ')[1];
+       const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+       [clientId, clientSecret] = credentials.split(':');
+   }
 
-if (!req.headers.authorization || req.headers.authorization.indexOf(&#39;Basic &#39;) === -1) {
-
-//check the body
-
-if(req.body.client\_Id){
-
-clientId = req.body.client\_Id;
-
-if(req.body.client\_secret){
-
-clientSecret = req.body.client\_secret;
-
-}
-
-}
-
-}else{
-
-const base64Credentials = req.headers.authorization.split(&#39; &#39;)[1];
-
-const credentials = _ **Buffer** _.from(base64Credentials, &#39;base64&#39;).toString(&#39;ascii&#39;);
-
-[clientId, clientSecret] = credentials.split(&#39;:&#39;);
-
-}
-
-return { id: clientId, secret: clientSecret };
-
+   return { id: clientId, secret: clientSecret };
 };
 
+```
   
 ## Servicios MongoDB
 
@@ -480,17 +398,15 @@ Dentro del archivo mongoUser se tienen las siguientes funciones:
 
 Dentro del archivo mongoClient se tienen las siguientes funciones:
 
-var _ **clientModel** _ = require(&#39;./mongo/model/client&#39;);
+```javascript
+var clientModel = require('./mongo/model/client');
 
 async function getClient (clientId){
-
-let client = await _ **clientModel** _.findOne({clientId: clientId}).exec();
-
-return client;
-
+   let client = await clientModel.findOne({clientId: clientId}).exec();
+   return client;
 }
-
 module.exports.getClient = getClient;
+```
 
 - getClient (clientId)retorna el cliente correspondiente al parametro clientId pasado en la función
 
@@ -516,12 +432,14 @@ Los esquemas o &quot;_schemas_&quot; son la definición de la entidad, es decir,
 
 El modelo o &quot;_model_&quot; se genera con base al _schema_, y nos permite generar operaciones CRUD hacia la base de datos.
 
+```javascript
 var mongoose = require(‘mongoose’),
 modelName = ‘client’,
 schemaDefinition = require(’…/schema/’ + modelName),
 schemaInstance = mongoose.Schema(schemaDefinition),
 modelInstance = mongoose.model(modelName, schemaInstance);
 module.exports = modelInstance;
+```
 
 En la figura anterior (/schema/client.js), el campo modelName es el nombre de la base de datos dentro de MongoDB, solo que para la creación del modelo en mongoose el nombre es singular y en la base de datos tiene que ser plural (clients). Esta rúbrica se describe en la documentación de mongoose.
 
