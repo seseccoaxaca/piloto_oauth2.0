@@ -1,4 +1,4 @@
-var userModel = require('./mongo/model/token');
+var userModel = require('../model/token');
 
 async  function getTokenByRefresh (refresh_token){
     return  await userModel.findOne({

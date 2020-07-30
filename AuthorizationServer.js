@@ -10,9 +10,9 @@ var jwt = require('jsonwebtoken');
 
 require('dotenv').config({path: './config/config.env'});
 
-var userService= require("./mongoUser");
-var clientService = require("./mongoClient");
-var tokenService = require("./mongoToken");
+var userService= require("./mongo/service/mongoUser");
+var clientService = require("./mongo/service/mongoClient");
+var tokenService = require("./mongo/service/mongoToken");
 var tokenModel = require('./mongo/model/token');
 
 var app = express();
@@ -63,7 +63,7 @@ app.post('/oauth/token',async  function(req, res) {
                                     res.status(200).json(tokenResponse);
                                 });
                             } else {
-                                return res.status(401).json({message: 'Invalid Authentication Credentials user'});
+                                return res.status(401).json({code: '401' ,message: 'Error en las credenciales del usuario, verificar los datos '});
                             }
                         }
                     } else if (req.body.grant_type === 'refresh_token') {
@@ -103,26 +103,28 @@ app.post('/oauth/token',async  function(req, res) {
                                         if (valueDelete.ok == 1 && valueDelete.deletedCount == 1) {
                                             console.log("token removed");
                                         }
-                                        return res.status(401).json({message: 'Invalid token '});
+                                        return res.status(401).json({code: '401' ,message: 'El refresh token ha expirado'});
                                     }
                                 } else {
-                                    return res.status(401).json({message: 'compromised token by client Id'});
+                                    return res.status(401).json({code: '401' , message: 'Clientid invalido, revise el campo '});
                                 }
                             } else {
-                                return res.status(401).json({message: 'Error refreshToken'});
+                                return res.status(401).json({code: '401' ,message: 'El refresh token es invalido, revisar sintaxis '});
                             }
                         } else {
-                            return res.status(401).json({message: 'Invalid param refresh'});
+                            return res.status(401).json({code: '401' ,message: 'El refresh token falta en la solicitud, verificar campo '});
                         }
                     } else {
-                        return res.status(401).json({message: 'unsupported_response_type'});
+                        return res.status(401).json({code: '401' , message: 'Grant type no soportado'});
                     }
                 }else{
-                        return res.status(401).json({message: 'client error auth'});
+                        return res.status(401).json({code: '401' ,message: 'Error en el la contraseña del cliente'});
                     }
                 }else{
-                    return res.status(401).json({ message: 'Invalid Authentication Credentials Client' });
+                    return res.status(401).json({code: '401',  message: 'Credenciales del cliente incorrectas' });
                 }
+    }else{
+        return res.status(401).json({code: '401',  message: 'Parametros de cliente mandados incorrectamente ' });
     }
 });
 
@@ -156,8 +158,8 @@ let decodeClientCredentials = function(req) {
 
     if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
         //check the body
-        if(req.body.client_Id){
-            clientId = req.body.client_Id;
+        if(req.body.client_id){
+            clientId = req.body.client_id;
             if(req.body.client_secret){
                 clientSecret = req.body.client_secret;
             }
@@ -171,7 +173,7 @@ let decodeClientCredentials = function(req) {
     return { id: clientId, secret: clientSecret };
 };
 
-let server = app.listen(9003, function () {
+let server = app.listen(process.env.PORTSERVER, function () {
     let host = server.address().address;
     let port = server.address().port;
     console.log(' Authorization Server is listening at http://%s:%s', host, port);
