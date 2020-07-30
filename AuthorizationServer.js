@@ -37,10 +37,9 @@ app.post('/oauth/token',async  function(req, res) {
                     }
                     if(clientObject.secret === clientSecret){
                     if (req.body.grant_type == 'password'){
-                        let username = req.body.username;
-                        let password = req.body.password;
-
-                        if (username && password) {
+                        if (req.body.username && req.body.password) {
+                            let username = req.body.username;
+                            let password = req.body.password;
                             let user = await userService.getUser(username, password);
                             if (user) {
                                 let scopes= '';
@@ -65,6 +64,8 @@ app.post('/oauth/token',async  function(req, res) {
                             } else {
                                 return res.status(401).json({code: '401' ,message: 'Error en las credenciales del usuario, verificar los datos '});
                             }
+                        }else{
+                            return res.status(422).json({code: '422' ,message: 'No se enviaron correctamente los parametros del usuario'});
                         }
                     } else if (req.body.grant_type === 'refresh_token') {
                         // refresh token logic
@@ -112,19 +113,19 @@ app.post('/oauth/token',async  function(req, res) {
                                 return res.status(401).json({code: '401' ,message: 'El refresh token es invalido, revisar sintaxis '});
                             }
                         } else {
-                            return res.status(401).json({code: '401' ,message: 'El refresh token falta en la solicitud, verificar campo '});
+                            return res.status(422).json({code: '422' ,message: 'El refresh token falta en la solicitud, verificar campo '});
                         }
                     } else {
                         return res.status(401).json({code: '401' , message: 'Grant type no soportado'});
                     }
                 }else{
-                        return res.status(401).json({code: '401' ,message: 'Error en el la contraseña del cliente'});
+                        return res.status(401).json({code: '401' ,message: 'Error en la contraseña del cliente'});
                     }
                 }else{
                     return res.status(401).json({code: '401',  message: 'Credenciales del cliente incorrectas' });
                 }
     }else{
-        return res.status(401).json({code: '401',  message: 'Parametros de cliente mandados incorrectamente ' });
+        return res.status(401).json({code: '401',  message: 'Parametros de cliente enviados incorrectamente ' });
     }
 });
 
