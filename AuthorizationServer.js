@@ -27,7 +27,7 @@ const db = mongoose.connect('mongodb://'+process.env.USERMONGO+':'+process.env.P
 
 app.post('/oauth/token',async  function(req, res) {
     let clientObject = decodeClientCredentials(req);
-    let scopeBody = req.body.scope ?  req.body.scope.split(' ') : undefined;
+    let scopeBody = req.body.scope ?  req.body.scope.split(' ') : [];
     if(clientObject.id){
         let cliente = await clientService.getClient(clientObject.id);
                 if(cliente){
@@ -41,15 +41,27 @@ app.post('/oauth/token',async  function(req, res) {
                             let username = req.body.username;
                             let password = req.body.password;
                             let user = await userService.getUser(username, password);
+                            let scopes= '';
                             if (user) {
-                                let scopes= '';
-                                let arrayUserScope= user.scope;
-                                if(scopeBody != undefined){
-                                    scopeBody.forEach(function(entry) {
-                                       if(arrayUserScope.includes(entry)){
-                                           scopes = scopes + entry + ' ';
-                                       }
-                                    });
+                                if(user.scope.length < scopeBody.length){
+                                    return res.status(422).json({code: '422' ,message: 'Scope no válido'});
+                                }else {
+                                    let arrayUserScope= user.scope;
+                                    if(scopeBody.length > 0){
+                                        let errorScopeInvalid = false;
+                                        scopeBody.forEach(function(entry){
+                                            if(arrayUserScope.includes(entry)){
+                                                scopes = scopes + entry + ' ';
+                                            }else{
+                                                errorScopeInvalid = true;
+                                            }
+                                        });
+                                    if(errorScopeInvalid){
+                                        return res.status(422).json({code: '422' ,message: 'Scope no válido'});
+                                    }
+                                    }else if(arrayUserScope.length > 0){
+                                        return res.status(422).json({code: '422' ,message: 'Scope no proporcionado'});
+                                    }
                                 }
 
                                 let tokenResponse = createToken(clientObject.id, user.username, scopes);
@@ -59,6 +71,9 @@ app.post('/oauth/token',async  function(req, res) {
                                     delete tokenResponse.client;
                                     delete tokenResponse.user;
                                     delete tokenResponse.refresh_token_expires_in_date;
+                                    if(tokenResponse.scope == ''){
+                                        delete tokenResponse.scope;
+                                    }
                                     res.status(200).json(tokenResponse);
                                 });
                             } else {
@@ -78,13 +93,26 @@ app.post('/oauth/token',async  function(req, res) {
                                     if (token.refresh_token_expires_in_date >= now) {
                                         let user = await userService.getUserByUsername(token.user.username);
                                         let scopes= '';
-                                        let arrayUserScope= user.scope;
-                                        if(scopeBody != undefined){
-                                            scopeBody.forEach(function(entry) {
-                                                if(arrayUserScope.includes(entry)){
-                                                    scopes = scopes + entry + ' ';
+
+                                        if(user.scope.length < scopeBody.length){
+                                            return res.status(422).json({code: '422' ,message: 'Scope no válido'});
+                                        }else {
+                                            let arrayUserScope= user.scope;
+                                            if(scopeBody.length > 0){
+                                                let errorScopeInvalid = false;
+                                                scopeBody.forEach(function(entry){
+                                                    if(arrayUserScope.includes(entry)){
+                                                        scopes = scopes + entry + ' ';
+                                                    }else{
+                                                        errorScopeInvalid = true;
+                                                    }
+                                                });
+                                                if(errorScopeInvalid){
+                                                    return res.status(422).json({code: '422' ,message: 'Scope no válido'});
                                                 }
-                                            });
+                                            }else if(arrayUserScope.length > 0){
+                                                return res.status(422).json({code: '422' ,message: 'Scope no proporcionado'});
+                                            }
                                         }
 
                                         let tokenResponse = createToken(clientObject.id, token.user.username, scopes);
@@ -94,6 +122,9 @@ app.post('/oauth/token',async  function(req, res) {
                                             delete tokenResponse.client;
                                             delete tokenResponse.user;
                                             delete tokenResponse.refresh_token_expires_in_date;
+                                            if(tokenResponse.scope == ''){
+                                                delete tokenResponse.scope;
+                                            }
                                             let valueDelete = await tokenService.removeTokenByRefresh(refresh);
                                             if (valueDelete.ok == 1 && valueDelete.deletedCount == 1) {
                                                 await res.status(200).json(tokenResponse);
