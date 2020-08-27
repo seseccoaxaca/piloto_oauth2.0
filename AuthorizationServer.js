@@ -7,8 +7,13 @@ __.string = require('underscore.string');
 const mongoose = require('mongoose');
 var randtoken = require('rand-token');
 var jwt = require('jsonwebtoken');
+const https = require('https')
+const fs = require('fs');
+var cors = require('cors');
+
 
 require('dotenv').config({path: './config/config.env'});
+//require('dotenv').config({path: './config/configuration.env'});
 
 var userService= require("./mongo/service/mongoUser");
 var clientService = require("./mongo/service/mongoClient");
@@ -173,7 +178,7 @@ function createToken(clientId,username, scope){
         access_token: access_token,
         token_type: 'bearer',
         expires_in: expiresin, //value in seconds
-        refreshToken: randtoken.uid(256),
+        refresh_token: randtoken.uid(256),
         refresh_token_expires_in: Number(process.env.RTEXT) , //value in seconds
         refresh_token_expires_in_date: Math.floor(Date.now() / 1000) + Number(process.env.RTEXT) ,
         scope: scope,
@@ -210,4 +215,13 @@ let server = app.listen(process.env.PORTSERVER, function () {
     let port = server.address().port;
     console.log(' Authorization Server is listening at http://%s:%s', host, port);
 });
+
+/*// we will pass our 'app' to 'https' server
+https.createServer({
+    key: fs.readFileSync('./cert/key.pem'),
+    cert: fs.readFileSync('./cert/cert.pem'),
+    passphrase: '3BPDNS2S3TXM'
+}, app)
+    .listen(process.env.PORTSERVER);*/
+
 

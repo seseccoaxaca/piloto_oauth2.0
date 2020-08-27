@@ -133,7 +133,7 @@ Nombre de la colección: **tokens**
 | --- | --- | --- | --- |
 | access\_token | String | &#39;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVjYW1hcmdvIiwianRpIjoiR1VoQ1dNR0siLCJzY29wZSI6IndyaXRlICIsImlhdCI6MTU5NTMwNDAwMiwiZXhwIjoxNTk1MzA0MDYyfQ.n5JLQo0fl7l0LbJ\_anPfsA3O2r-EMlGmvK0fJ-LP2Zg&#39; | Token en formato JWT el cual permite la validación de identidad en el recurso protegido |
 | expires\_in | Number | 300 | Tiempo de expiración del access\_token en segundos |
-| refreshToken | String | OztWyf5YGjPJxrkkx4feeRGT3eup21yRMZgfMuNLrwBKvsIcKT3u6PvyjGlfc951nLhr0tNOZT4UezG971FXUNBaUNDaWNO6h8Uzno62wJA5K3iRF9smW4IdgmXMpkr4fB0C5KfQmsjNZL02bTzrQBmJ4BEOTmRjseAkr0A3JQU3vFtIyyXHQWxVaW03tNDgu001feEgQ15XilnmWq9zubngnnLLoZrN6bah3UhGxSwFgydgzR9W19CpxDdryrsE | Token (random string) el cual se utiliza para generar un nuevo token (flujo refresh token) |
+| refresh_token | String | OztWyf5YGjPJxrkkx4feeRGT3eup21yRMZgfMuNLrwBKvsIcKT3u6PvyjGlfc951nLhr0tNOZT4UezG971FXUNBaUNDaWNO6h8Uzno62wJA5K3iRF9smW4IdgmXMpkr4fB0C5KfQmsjNZL02bTzrQBmJ4BEOTmRjseAkr0A3JQU3vFtIyyXHQWxVaW03tNDgu001feEgQ15XilnmWq9zubngnnLLoZrN6bah3UhGxSwFgydgzR9W19CpxDdryrsE | Token (random string) el cual se utiliza para generar un nuevo token (flujo refresh token) |
 | refresh\_token\_expires\_in | Number | 600 | Tiempo de expiración del refresh token en segundos |
 | refresh\_token\_expires\_in\_date | Number | 1595275826 | unix timestamp de la expiracion del refresh token |
 | client | Object | {clientId: &#39;pdn.resource.1&#39;} | Se almacena solo el id del cliente |
@@ -270,7 +270,7 @@ Debido a que los scopes son opcionales, o sea, no están definidos; esto queda f
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVjYW1hcmdvIiwianRpIjoiYjdjOFBEZkYiLCJzY29wZSI6InJlYWQgIiwiaWF0IjoxNTk2MDU3ODI2LCJleHAiOjE1OTYwNTgxMjZ9.Zoe3oJwjsuM_0r2Z72fyZnaWqO0yNLZ06jm3yReDzqE",
     "token_type": "bearer",
     "expires_in": 300,
-    "refreshToken": "D2MeNrnDRnMBsLdV6LQkoDow7Y5Mt8eLgaM76FR3BNVbz6TdtXWXhvB6wLaRR5jVaj2oCkNLge4ODw1TYSnop7dHJ4zRGgK0iE6CrlcXsrN97XVkYg8Kr75bWKSBfAm3q4CoRPr31XB3XyV1agFTSdAbYQ6XutVxEsGytZg7ljDBeO0bKicVkSF7qMTlFWilHtuG7mKCcRJd1y5dROhXI15TvemNlB5eD6LVyyyE3qmKf1Vx9nG8MYZb4tSV8Ky5",
+    "refresh_token": "D2MeNrnDRnMBsLdV6LQkoDow7Y5Mt8eLgaM76FR3BNVbz6TdtXWXhvB6wLaRR5jVaj2oCkNLge4ODw1TYSnop7dHJ4zRGgK0iE6CrlcXsrN97XVkYg8Kr75bWKSBfAm3q4CoRPr31XB3XyV1agFTSdAbYQ6XutVxEsGytZg7ljDBeO0bKicVkSF7qMTlFWilHtuG7mKCcRJd1y5dROhXI15TvemNlB5eD6LVyyyE3qmKf1Vx9nG8MYZb4tSV8Ky5",
     "refresh_token_expires_in": 600,
     "scope": "read "
 }
@@ -337,7 +337,7 @@ function createToken(clientId,username, scope){
        access_token: access_token,
        token_type: 'bearer',
        expires_in: expiresin, //value in seconds
-       refreshToken: randtoken.uid(256),
+       refresh_token: randtoken.uid(256),
        refresh_token_expires_in: Number(process.env.RTEXT) , //value in seconds
        refresh_token_expires_in_date: Math.floor(Date.now() / 1000) + Number(process.env.RTEXT) ,
        scope: scope,
@@ -351,7 +351,7 @@ function createToken(clientId,username, scope){
 
 En el código, se obtiene la expiración del token y posteriormente, se genera el JWT. Aquí se observa que solicitamos variables de entorno relacionadas con el token como el **SEED** ylos tiempos de expiración.
 
-Una vez creado el JWT se agrega como valor al campo access\_token,se llenan los demás campos con los parámetros en entrada de la función y otros se generan en tiempo de ejecución, como lo es el refreshToken que es un random String. Para esto último, se usa la librería rand-token para generar el token y retornar el objeto.
+Una vez creado el JWT se agrega como valor al campo access\_token,se llenan los demás campos con los parámetros en entrada de la función y otros se generan en tiempo de ejecución, como lo es el refresh_token que es un random String. Para esto último, se usa la librería rand-token para generar el token y retornar el objeto.
 
 Para mayor información de la librería rand-token, consulte el siguiente enlace: [https://www.npmjs.com/package/rand-token](https://www.npmjs.com/package/rand-token)
 

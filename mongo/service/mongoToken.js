@@ -2,13 +2,13 @@ var userModel = require('../model/token');
 
 async  function getTokenByRefresh (refresh_token){
     return  await userModel.findOne({
-        refreshToken: refresh_token
+        refresh_token: refresh_token
     }).exec();
 }
 
 async function removeTokenByRefresh (refresh_token){
     return  await userModel.deleteOne({
-        refreshToken: refresh_token
+        refresh_token: refresh_token
     }).exec();
 }
 
