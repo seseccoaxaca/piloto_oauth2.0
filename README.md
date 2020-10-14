@@ -1,8 +1,23 @@
+## Introducción
+El proyecto contiene la implementación del protocolo de autorización OAuth2.0 utilizado por las APIs para comunicarse con la PDN.
+
+Utiliza el grant_type password e implementa el flujo de refresh_token, acorde a las especificaciones emitidas por la PDN, basandose en el uso de JWT para el control y administración de los tokens. 
+
+Este proyecto forma parte de una solución que contempla las APIs del S2 y S3 en ambiente de desarrollo, para reproducirlo completamente, se sugiere el siguiente orden:
+* Instalación: preparación del ambiente de desarrollo.
+* Generador: generador de datos sintéticos para el S2 y S3. Proyecto: [https://github.com/PDNMX/piloto_generador](https://github.com/PDNMX/piloto_generador)
+* OAuth2.0: implementación del protocolo de autorización.
+* API S2: API para conectarse a la PDN en el Sistema 2. Proyecto: [https://github.com/PDNMX/piloto_s2](https://github.com/PDNMX/piloto_s2)
+* API S3S: API para conectarse a la PDN en el Sistema 3 Servidores sancionados. Proyecto: [https://github.com/PDNMX/piloto_s3s](https://github.com/PDNMX/piloto_s3s)
+* API S3P: API para conectarse a la PDN en el Sistema 3 Particulares Sancionados. Proyecto: [https://github.com/PDNMX/piloto_s3p](https://github.com/PDNMX/piloto_s3p)
+
+Documentación: https://drive.google.com/drive/folders/1aQLhmtKwbWiTy20Ei9k-zy6hneUuYTn2?usp=sharing
+
 ## Pre - requisitos
 
 Versión estable SLP (soporte de largo-plazo) de NodeJs y NPM previamente instalados, si no se cuenta con ellos puede descargarlos del siguiente enlace [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 
-Ambiente con la base de datos MongoDB instalado y configurado. Se asume que el usuario conoce ya las credenciales asignadas a la base de datos, esta información es indispensable. Para más información, vea el reporte de instalación, [Ref.[1]](https://docs.google.com/document/d/1RQQssZpUOH6d5103QMPkY6v2wakRvQk0yLqobm1AzB8/edit#bookmark=id.x8piaddu7vbs).
+Ambiente con la base de datos MongoDB instalado y configurado. Se asume que el usuario conoce ya las credenciales asignadas a la base de datos, esta información es indispensable. Para más información, vea el documento de instalación.
 
 Se recomienda haber leído este documento en su totalidad antes de replicar el generador de datos de manera local.
 
@@ -119,7 +134,7 @@ Nombre de la colección: **clients**
 
 | **Nombre del campo** | **Tipo** | **Valor posible** | **Descripción** |
 | --- | --- | --- | --- |
-| clientId | String | &#39;txm.global&#39; | Identificador del cliente |
+| clientId | String | &#39;pdn&#39; | Identificador del cliente |
 | clientSecret | String | &#39;pass&#39; | Contraseña del cliente |
 | grants | Array String | [&#39;admin&#39;] | Privilegios asociados con el cliente |
 
@@ -168,7 +183,7 @@ db.users.insert([
 ])
 
 db.clients.insert([{
-    clientId: 'txm.global',
+    clientId: 'pdn',
     clientSecret: 'pass',
     grants: []
 }
@@ -203,12 +218,12 @@ Ejemplos :
 
 ```json
 {
-    clientId: 'txm.global',
+    clientId: 'pdn',
     grants: []
 }
 
 {
-    clientId: 'txm.global',
+    clientId: 'pdn',
     clientSecret: "",
     grants: []
 }
@@ -227,7 +242,7 @@ Ejemplo 1 del comando curl enviando las credenciales del cliente por el encabeza
 
 Valores :
 
-client\_id = txm.global
+client\_id = pdn
 
 client\_secret = pass
 
@@ -238,7 +253,7 @@ curl --location --request POST '<IP_HOST>:9003/oauth/token' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --header 'Authorization: Basic dHhtLmdsb2JhbDpwYXNz' \
 --data-urlencode 'grant_type=password' \
---data-urlencode 'username=ecamargo' \
+--data-urlencode 'username=pdn' \
 --data-urlencode 'password=123456' \
 --data-urlencode 'scope=read writeSuper'
 ```
@@ -248,9 +263,9 @@ Ejemplo 2 del comando curl enviando las credenciales del cliente por medio del b
 ```sh
 curl --location --request POST 'http://127.0.0.1:9003/oauth/token' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
---data-urlencode 'client_id=txm.global' \
+--data-urlencode 'client_id=pdn' \
 --data-urlencode 'grant_type=password' \
---data-urlencode 'username=ecamargo' \
+--data-urlencode 'username=pdn' \
 --data-urlencode 'password=123456' \
 --data-urlencode 'scope=read' \
 --data-urlencode 'client_secret=pass'
@@ -500,14 +515,9 @@ La lógica principal se encuentra en la solicitud tipo post/oauth/token.Dentro d
 
 # Glosario
 
-El glosario general se incluye en el anexo Guía de ayuda, [Ref.[4]](#xdfe451pw6sm).
+El glosario general se incluye en el Anexo.
 
 
 # Referencias
+Documentación: https://drive.google.com/drive/folders/1aQLhmtKwbWiTy20Ei9k-zy6hneUuYTn2?usp=sharing
 
-| **Ref.** | **Nombre del documento** | **Número del documento** |
-| --- | --- | --- |
-| 1 | [Guía de referencia protocolo de autorización](https://drive.google.com/file/d/17-npQleAV87gV19hbmtzgZipegl0qrIO/view) | - |
-| 2 | [Reporte de instalación](https://docs.google.com/document/d/1T31p7_n89bOMkW9ZC_G0ZGoldc_XyB_fWuMZ7u9Qlvo/edit?usp=sharing)[GOV UK\_IIR\_Interconnection of S2 and S3 of the PDN](https://docs.google.com/document/d/1T31p7_n89bOMkW9ZC_G0ZGoldc_XyB_fWuMZ7u9Qlvo/edit?usp=sharing) | TXMG-00848 |
-| 3 | [Generador de Datos Sintéticos](https://docs.google.com/document/d/1RQQssZpUOH6d5103QMPkY6v2wakRvQk0yLqobm1AzB8/edit?usp=sharing)[GOV UK\_Gen\_Interconnection of S2 and S3 to the PDN](https://docs.google.com/document/d/1RQQssZpUOH6d5103QMPkY6v2wakRvQk0yLqobm1AzB8/edit?usp=sharing) | TXMG-00850 |
-| 4 | [Guía de ayuda](https://docs.google.com/document/d/1qbxdN9IKSrzdO57NoIgWctBiBNZo4r1-PwfW2Ac2YWc/edit?usp=sharing)[GOV UK\_Anexo\_Interconnection of S2 and S3 of the PDN](https://docs.google.com/document/d/1qbxdN9IKSrzdO57NoIgWctBiBNZo4r1-PwfW2Ac2YWc/edit?usp=sharing) | TXMG-00853 |
