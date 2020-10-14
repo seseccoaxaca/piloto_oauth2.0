@@ -14,5 +14,5 @@ Este proyecto forma parte de una solución que contempla las APIs del S2 y S3 en
 
 ## Documentación
 
-[Documentación OAuth2.0](https://docs.google.com/document/d/1UoUKII1dscdKojGMEdUyLls0CKPp4pe2E28djCYMf6A/edit?usp=sharing)
-[Documentación completa](https://drive.google.com/drive/folders/1aQLhmtKwbWiTy20Ei9k-zy6hneUuYTn2?usp=sharing)
+* [Documentación OAuth2.0](https://docs.google.com/document/d/1UoUKII1dscdKojGMEdUyLls0CKPp4pe2E28djCYMf6A/edit?usp=sharing)
+* [Documentación completa](https://drive.google.com/drive/folders/1aQLhmtKwbWiTy20Ei9k-zy6hneUuYTn2?usp=sharing)
