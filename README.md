@@ -4,7 +4,7 @@ El proyecto contiene la implementación del protocolo de autorización OAuth2.0 
 Utiliza el grant_type password e implementa el flujo de refresh_token, acorde a las especificaciones emitidas por la PDN, basandose en el uso de JWT para el control y administración de los tokens. 
 
 Este proyecto forma parte de una solución que contempla las APIs del S2 y S3 en ambiente de desarrollo, para reproducirlo completamente, se sugiere el siguiente orden:
-* Instalación: preparación del ambiente de desarrollo.
+* [Instalación](https://docs.google.com/document/d/1aQ0_f3sGiyE94anGy2pwOFn6KLucYTc3ZkrWM8rikIo/edit?usp=sharing): preparación del ambiente de desarrollo.
 * [Generador](https://github.com/PDNMX/piloto_generador): generador de datos sintéticos para el S2 y S3. 
 * [OAuth2.0](https://github.com/PDNMX/piloto_oauth2.0): implementación del protocolo de autorización.
 * [API S2](https://github.com/PDNMX/piloto_s2): API para conectarse a la PDN en el Sistema 2. 
