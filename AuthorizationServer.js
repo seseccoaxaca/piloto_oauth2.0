@@ -176,7 +176,7 @@ function createToken(clientId,username, scope){
 
     let tokenResponse = {
         access_token: access_token,
-        token_type: 'bearer',
+        token_type: 'Bearer',
         expires_in: expiresin, //value in seconds
         refresh_token: randtoken.uid(256),
         refresh_token_expires_in: Number(process.env.RTEXT) , //value in seconds
